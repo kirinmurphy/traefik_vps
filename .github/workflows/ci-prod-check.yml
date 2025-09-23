@@ -1,0 +1,37 @@
+name: Production Config Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate_prod_config:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create external network for test
+        run: docker network create web
+
+      - name: Start Traefik from production config
+        run: docker compose -f docker-compose.production.yml up -d traefik
+        env:
+          SSL_CERTIFICATION_EMAIL: fakeuser@email.com
+
+      - name: Wait for Traefik to be healthy
+        run: |
+          echo "Waiting for Traefik to be healthy..."
+          timeout 60s bash -c 'until docker inspect --format="{{.State.Health.Status}}" traefik-proxy | grep "healthy"; do sleep 1; done'
+
+      - name: Check Traefik container status
+        run: docker ps --filter "name=traefik-proxy" --format "{{.Names}} {{.Status}}"

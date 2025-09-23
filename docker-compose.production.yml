@@ -1,0 +1,30 @@
+services:
+  traefik:
+    extends:
+      file: docker-compose.base.yml
+      service: traefik
+    command:
+      - --certificatesresolvers.myresolver.acme.email=${SSL_CERTIFICATION_EMAIL}
+      - --configFile=/traefik/traefik.yml
+    volumes:
+      - ./traefik/traefik.yml:/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/traefik/dynamic:ro
+      - ./acme.json:/acme.json
+    # environment:
+    #   - SSL_CERTIFICATION_EMAIL=${SSL_CERTIFICATION_EMAIL}
+    networks:
+      - web
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://localhost:8080/dashboard || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+networks:
+  web:
+    external: true

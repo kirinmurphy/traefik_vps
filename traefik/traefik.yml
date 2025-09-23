@@ -1,0 +1,40 @@
+api:
+  dashboard: true
+  insecure: true
+
+log:
+  level: DEBUG
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: web
+  file:
+    directory: /traefik/dynamic
+    watch: true
+
+certificatesResolvers:
+  myresolver:
+    acme:
+      # email: "${SSL_CERTIFICATION_EMAIL}"
+      storage: /acme.json
+      # tlsChallenge: {}
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"
+      keyType: RSA4096
+
+      # ADD THIS BLOCK TO ENABLE THE HTTP-01 CHALLENGE METHOD
+      httpChallenge:
+        entryPoint: web # Must be your EntryPoint listening on port 80
