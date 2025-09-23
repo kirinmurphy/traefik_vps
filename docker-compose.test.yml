@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  traefik:
+    extends:
+      file: docker-compose.base.yml
+      service: traefik
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.file.directory=/etc/traefik/certs
+      - --providers.file.watch=true
+    environment:
+      - SSL_CERTIFICATION_EMAIL=testemail@email.com
+    volumes:
+      - ./certs:/etc/traefik/certs
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-app
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.test.rule=Host(`localhost`)"
+      - "traefik.http.routers.test.entrypoints=websecure"
+      - "traefik.http.routers.test.tls=true"
+      - "traefik.http.services.test.loadbalancer.server.port=80"
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge

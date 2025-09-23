@@ -1,0 +1,11 @@
+http:
+  services:
+    nginx:
+      loadBalancer:
+        serversTransport: nginx-transport
+  serversTransports:
+    nginx-transport:
+      forwardingTimeouts:
+        dialTimeout: 10s
+        responseHeaderTimeout: 20s
+        idleConnTimeout: 90s
