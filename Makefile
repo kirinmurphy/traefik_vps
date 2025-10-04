@@ -16,7 +16,7 @@ down:
 	@docker compose -f $(COMPOSE_FILE) down
 	@echo "Traefik container has been stopped."
 
-recreate: ensure-network
+restart: ensure-network
 	@docker compose -f $(COMPOSE_FILE) up -d --force-recreate
 
-.PHONY: ensure-network up down recreate
+.PHONY: ensure-network up down restart
