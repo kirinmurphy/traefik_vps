@@ -10,8 +10,6 @@ services:
       - ./traefik/traefik.yml:/traefik/traefik.yml:ro
       - ./traefik/dynamic:/traefik/dynamic:ro
       - ./acme.json:/acme.json
-    # environment:
-    #   - SSL_CERTIFICATION_EMAIL=${SSL_CERTIFICATION_EMAIL}
     networks:
       - web
     healthcheck:
