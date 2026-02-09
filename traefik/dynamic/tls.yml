@@ -1,7 +1,15 @@
 tls:
   options:
-    default-tls-options:
+    default:
       minVersion: VersionTLS12
+      sniStrict: true
       cipherSuites:
+        - TLS_AES_128_GCM_SHA256
+        - TLS_AES_256_GCM_SHA384
+        - TLS_CHACHA20_POLY1305_SHA256
         - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      curvePreferences:
+        - X25519
+        - CurveP521
+        - CurveP384
