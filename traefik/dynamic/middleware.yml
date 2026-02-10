@@ -17,6 +17,12 @@ http:
           X-XSS-Protection: "0"
           Permissions-Policy: "camera=(), microphone=(), geolocation=()"
 
+    cross-origin-isolation:
+      headers:
+        customResponseHeaders:
+          Cross-Origin-Opener-Policy: "same-origin"
+          Cross-Origin-Resource-Policy: "same-site"
+
     rate-limit:
       rateLimit:
         average: 100
@@ -25,3 +31,10 @@ http:
 
     compress:
       compress: {}
+
+    in-flight-req:
+      inFlightReq:
+        amount: 100
+        sourceCriterion:
+          ipStrategy:
+            depth: 0
