@@ -5,9 +5,15 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    read_only: true
     ports:
       - 80:80
       - 443:443
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro

@@ -4,3 +4,24 @@ http:
       redirectScheme:
         scheme: https
         permanent: true
+
+    security-headers:
+      headers:
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: strict-origin-when-cross-origin
+        customResponseHeaders:
+          X-XSS-Protection: "0"
+          Permissions-Policy: "camera=(), microphone=(), geolocation=()"
+
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1s
+
+    compress:
+      compress: {}

@@ -1,9 +1,11 @@
 api:
   dashboard: true
-  insecure: true
+
+ping:
+  entryPoint: traefik
 
 log:
-  level: DEBUG
+  level: WARN
 
 entryPoints:
   web:
@@ -16,6 +18,11 @@ entryPoints:
 
   websecure:
     address: ":443"
+    http:
+      middlewares:
+        - security-headers@file
+        - rate-limit@file
+        - compress@file
 
 providers:
   docker:
