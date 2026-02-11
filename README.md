@@ -75,7 +75,7 @@ Imagine you have more than one application that you manage for a site. Instead o
 ## **Security & Observability**
 
 ### Access Logging
-JSON-formatted access logs are written to stdout for security auditing. All standard request fields (client IP, method, path, status, duration, TLS version) are kept. Request headers are dropped by default to avoid logging cookies and auth tokens, with selective exceptions for `User-Agent`, `Content-Type`, `X-Forwarded-For`, and `X-Real-Ip`.
+JSON-formatted access logs are written to `/var/log/traefik/access.log` (volume-mounted from the host for fail2ban integration). All standard request fields (client IP, method, path, status, duration, TLS version) are kept. Request headers are dropped by default to avoid logging cookies and auth tokens, with selective exceptions for `User-Agent`, `Content-Type`, `X-Forwarded-For`, and `X-Real-Ip`.
 
 ### Security Headers
 Applied globally via the `security-headers` middleware:
