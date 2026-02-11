@@ -72,6 +72,43 @@ Imagine you have more than one application that you manage for a site. Instead o
          - "traefik.http.routers.my-app.tls.certresolver=myresolver"
    ```
 
+## **Security & Observability**
+
+### Access Logging
+JSON-formatted access logs are written to stdout for security auditing. All standard request fields (client IP, method, path, status, duration, TLS version) are kept. Request headers are dropped by default to avoid logging cookies and auth tokens, with selective exceptions for `User-Agent`, `Content-Type`, `X-Forwarded-For`, and `X-Real-Ip`.
+
+### Security Headers
+Applied globally via the `security-headers` middleware:
+- **Strict-Transport-Security** — HTTPS-only for 2 years, including subdomains, with preload
+- **X-Content-Type-Options: nosniff** — prevents MIME-type sniffing
+- **X-Frame-Options: DENY** — blocks iframe embedding (clickjacking protection)
+- **Referrer-Policy: strict-origin-when-cross-origin** — limits referrer data to external sites
+- **X-XSS-Protection: "0"** — disables legacy XSS auditor (deprecated, itself exploitable)
+- **Permissions-Policy** — blocks camera, microphone, and geolocation APIs
+
+### Cross-Origin Isolation (opt-in)
+Available via the `cross-origin-isolation` middleware but **not applied globally** — services opt in via Docker labels since these headers can break OAuth popups, external CDN resources, and cross-origin window interactions.
+- **Cross-Origin-Opener-Policy: same-origin** — isolates browsing context from cross-origin popups
+- **Cross-Origin-Resource-Policy: same-site** — prevents cross-origin resource reads (allows subdomains)
+
+To attach, add to your service's Docker labels:
+```yml
+labels:
+  - "traefik.http.routers.my-app.middlewares=cross-origin-isolation@file"
+```
+
+### Rate Limiting
+100 requests/second sustained with bursts up to 150 per client. Returns `429 Too Many Requests` when exceeded.
+
+### In-Flight Request Limiting
+Caps concurrent connections at 100 per source IP. Complements rate limiting by catching slow-connection exhaustion (slowloris-style) attacks.
+
+### Intentionally Excluded
+- **CSP** — handled by Helmet at the app level; inherently app-specific
+- **Request ID** — no native Traefik v3 support without plugins
+- **Buffering middleware** — container runs `read_only: true`, disk spill would fail
+- **ForwardedHeaders config** — default (`insecure: false`) is correct since Traefik is the edge proxy
+
 ## **CI Workflows**
 
 - **Test (ci-test.yml)**: Creates a temporary test environment and verifies that HTTPS routing works correctly with a sample Nginx service.

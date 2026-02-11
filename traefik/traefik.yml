@@ -7,6 +7,18 @@ ping:
 log:
   level: WARN
 
+accessLog:
+  format: json
+  fields:
+    defaultMode: keep
+    headers:
+      defaultMode: drop
+      names:
+        User-Agent: keep
+        Content-Type: keep
+        X-Forwarded-For: keep
+        X-Real-Ip: keep
+
 entryPoints:
   web:
     address: ":80"
@@ -15,6 +27,7 @@ entryPoints:
         entryPoint:
           to: websecure
           scheme: https
+          permanent: true
 
   websecure:
     address: ":443"
@@ -23,6 +36,7 @@ entryPoints:
         - security-headers@file
         - rate-limit@file
         - compress@file
+        - in-flight-req@file
 
 providers:
   docker:
